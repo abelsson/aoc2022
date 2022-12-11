@@ -1,111 +1,76 @@
-#[derive(Debug, Clone)]
-struct Monkey{
-    idx : i64,
-    items : Vec<i64>,
-    opa : String,
-    op: String,
-    opb : String,
+use itertools::Itertools;
+use std::mem;
 
-    div_by : i64,
-    true_dest : i64,
-    false_dest : i64,
-    inspections : i64,
+#[derive(Debug)]
+struct Monkey {
+    items: Vec<i64>,
+    op: (String, String, String),
+    div_by: i64,
+    true_dest: i64,
+    false_dest: i64,
+    inspections: i64,
 }
 
-fn parse_monkey(t : &Vec<String>, start : usize) -> (usize, Option<Monkey>) {
+fn parse_monkey(t: &Vec<String>, start: usize) -> (usize, Monkey) {
+    let idx_after = |token: &str, i: usize| {
+	i + t[i..].iter().take_while(|x| *x != token).count() + 1
+    };
 
-    let mut i = start;
-    while t[i] != "Monkey" {
-	i+=1;
-	if i >= t.len() {
-	    return (t.len(), None);
-	}
-    }
-    i += 1;
-    let monkey : i64 = t[i].parse().unwrap();
-    while t[i] != "items" { i+=1; }
-    let mut items: Vec<i64> = vec![];
+    let i0 = idx_after("items", start);
+    let i1 = idx_after("=", i0);
+    let i2 = idx_after("by", i1);
+    let i3 = idx_after("monkey", i2);
+    let i4 = idx_after("monkey", i3);
 
-    while t[i] != "=" {
-	if let Ok(num) = t[i].parse::<i64>() {
-	    items.push(num);
-	}
-	i += 1;
-    }
-    i += 1; //
-    let opa = &t[i]; i += 1;
-    let op = &t[i]; i += 1;
-    let opb = &t[i]; i += 1;
-    dbg!(monkey);
-    dbg!(opa, op, opb);
+    let res = Monkey {
+	items: t[i0..i1].iter()
+	    .filter_map(|x| x.parse::<i64>().ok())
+	    .collect(),
+	op: t[i1..].iter().map(String::to_string).next_tuple().unwrap(),
+	div_by: t[i2].parse::<i64>().unwrap(),
+	true_dest: t[i3].parse::<i64>().unwrap(),
+	false_dest: t[i4].parse::<i64>().unwrap(),
+	inspections: 0,
+    };
 
-    while t[i] != "by" { i+=1; } i+=1;
-
-    let div_by = t[i].parse::<i64>().unwrap();
-    while t[i] != "monkey" { i+=1; } i+=1;
-    let true_dest = t[i].parse::<i64>().unwrap();
-    while t[i] != "monkey" { i+=1; } i+=1;
-    let false_dest = t[i].parse::<i64>().unwrap();
-
-    dbg!(div_by, true_dest, false_dest);
-
-    let res = Monkey{ idx: monkey, items: items,
-		      opa: opa.to_string(), op: op.to_string(), opb: opb.to_string(),
-		      div_by: div_by,
-		      true_dest: true_dest, false_dest: false_dest,
-		      inspections: 0};
-    dbg!(&res);
-    return (i, Some(res));
+    return (i4 + 1, res);
 }
-pub fn func(lines: impl Iterator<Item = String>) {
 
+pub fn func(lines: impl Iterator<Item = String>, iterations: i32, calc: fn(i64, i64) -> i64) {
     let mut monkeys: Vec<Monkey> = Default::default();
     let mut tokens: Vec<String> = Default::default();
+
     for line in lines {
-	let elems = line.split(&[' ',':',',']).collect::<Vec<&str>>();
-	for elem in elems {
-	    tokens.push(elem.to_owned());
-	}
+	line.split(&[' ', ':', ','])
+	    .filter(|x| x.len() > 0)
+	    .for_each(|elem| tokens.push(elem.to_owned()));
     }
 
-/*
-    for token in &tokens {
-	println!("{token}");
-    }
-     */
     let mut start = 0;
     while start < tokens.len() {
 	let monkey;
 	(start, monkey) = parse_monkey(&tokens, start);
-	if let Some(m) = monkey {
-	    monkeys.push(m);
-	}
+	monkeys.push(monkey);
     }
-    dbg!(&monkeys);
 
     let gcd: i64 = monkeys.iter().map(|m| m.div_by).product();
-    dbg!(gcd);
-    for round in 0..10000 {
-
+    for _ in 0..iterations {
 	for idx in 0..monkeys.len() {
-
-	    let items = monkeys[idx].items.clone();
-	    monkeys[idx].items.clear();
-	    for item in items {
-		let a = match monkeys[idx].opa.as_str() {
+	    for item in mem::take(&mut monkeys[idx].items) {
+		let value = |s: &String| match s.as_str() {
 		    "old" => item,
 		    x => x.parse::<i64>().unwrap(),
 		};
-		let b = match monkeys[idx].opb.as_str() {
-		    "old" => item,
-		    x => x.parse::<i64>().unwrap(),
-		};
-		let res = match monkeys[idx].op.as_str() {
-		    "*" => (a * b) % gcd,
-		    "+" => (a + b) % gcd,
-		    "-" => a - b,
-		    _ => panic!()
-		};
+		let a = value(&monkeys[idx].op.0);
+		let b = value(&monkeys[idx].op.2);
+		let res = calc(
+		    match monkeys[idx].op.1.as_str() {
+			"*" => a * b,
+			"+" => a + b,
+			_ => panic!(),
+		    },
+		    gcd,
+		);
 		monkeys[idx].inspections += 1;
 
 		if res % monkeys[idx].div_by == 0 {
@@ -115,19 +80,25 @@ pub fn func(lines: impl Iterator<Item = String>) {
 		    let dest = monkeys[idx].false_dest as usize;
 		    monkeys[dest].items.push(res);
 		}
-
 	    }
 	}
     }
 
-    let mut insps: Vec<i64> = Vec::new();
+    let res: i64 = monkeys
+	.iter()
+	.map(|m| m.inspections)
+	.sorted()
+	.rev()
+	.take(2)
+	.product();
 
-    for m in &monkeys {
-	insps.push(m.inspections);
-    }
-    dbg!(&monkeys);
-    insps.sort();
-    dbg!(&insps);
+    println!("{}", res);
+}
 
+pub fn part1(lines: impl Iterator<Item = String>) {
+    func(lines, 20, |a, _| a / 3);
+}
 
+pub fn part2(lines: impl Iterator<Item = String>) {
+    func(lines, 10000, |a, b| a % b);
 }

@@ -1,16 +1,21 @@
-use std::ops::RangeInclusive;
 use itertools::Itertools;
+use std::ops::RangeInclusive;
 
-fn contained_in(range1 : &RangeInclusive<i32>, range2 : &RangeInclusive<i32>) -> bool {
+fn contained_in(range1: &RangeInclusive<i32>, range2: &RangeInclusive<i32>) -> bool {
     return range1.start() >= range2.start() && range1.end() <= range2.end();
 }
 
-fn ranges_disjoint(range1 : &RangeInclusive<i32>, range2 : &RangeInclusive<i32>) -> bool {
+fn ranges_disjoint(range1: &RangeInclusive<i32>, range2: &RangeInclusive<i32>) -> bool {
     return range1.start() > range2.end() || range1.end() < range2.start();
 }
 
 fn score(input: &str) -> u32 {
-    let (s1,e1,s2,e2) = input.split(&[',', '-']).map(|x| x.parse()).flatten().next_tuple().unwrap();
+    let (s1, e1, s2, e2) = input
+        .split(&[',', '-'])
+        .map(|x| x.parse())
+        .flatten()
+        .next_tuple()
+        .unwrap();
     let range1 = s1..=e1;
     let range2 = s2..=e2;
 
@@ -18,7 +23,12 @@ fn score(input: &str) -> u32 {
 }
 
 fn score2(input: &str) -> u32 {
-    let (s1,e1,s2,e2) = input.split(&[',', '-']).map(|x| x.parse()).flatten().next_tuple().unwrap();
+    let (s1, e1, s2, e2) = input
+        .split(&[',', '-'])
+        .map(|x| x.parse())
+        .flatten()
+        .next_tuple()
+        .unwrap();
 
     return !ranges_disjoint(&(s1..=e1), &(s2..=e2)) as u32;
 }

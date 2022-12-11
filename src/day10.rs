@@ -1,5 +1,4 @@
 pub fn func(lines: impl Iterator<Item = String>) {
-
     let mut x = 1;
     let mut cycle = 0;
     let mut delay = vec![Option::<i32>::None; 3];
@@ -13,9 +12,8 @@ pub fn func(lines: impl Iterator<Item = String>) {
                 let arg: i32 = cmd.next().unwrap().parse().unwrap();
                 delay[2] = Some(arg);
                 2
-            } ,
-            _ => { 1 }
-
+            }
+            _ => 1,
         };
 
         for _ in 0..time {
