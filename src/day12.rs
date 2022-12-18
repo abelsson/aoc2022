@@ -26,6 +26,7 @@ fn possible(map: &Vec<Vec<i32>>, pos: (i32, i32)) -> Vec<(i32, i32)> {
     return c;
 }
 
+/*
 fn print(map: &Vec<Vec<i32>>, visited: &Vec<(i32, i32)>) {
     let mut x = 0;
     let mut y = 0;
@@ -44,7 +45,7 @@ fn print(map: &Vec<Vec<i32>>, visited: &Vec<(i32, i32)>) {
     }
     println!("");
 }
-
+ */
 fn bfs(
     map: &Vec<Vec<i32>>,
     start: &(i32, i32),
@@ -95,7 +96,7 @@ pub fn func(lines: impl Iterator<Item = String>, starting_values: &Vec<i32>) {
     }
 
     let mut target: (i32, i32) = (0, 0);
-    let mut x = 0;
+    let mut x;
     let mut y = 0;
 
     //let res : Vec<usize> = map.iter().flatten().enumerate().filter(|x| *x.1 == -28).map(|x| x.0).collect();

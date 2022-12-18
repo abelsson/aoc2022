@@ -1,6 +1,5 @@
 use itertools::Itertools;
 use regex::Regex;
-use rayon::prelude::*;
 use std::iter::zip;
 
 fn manhattan_dist(a : &(i32, i32), b: &(i32, i32)) -> i32 {
@@ -9,7 +8,7 @@ fn manhattan_dist(a : &(i32, i32), b: &(i32, i32)) -> i32 {
     return x2 - x1 + y2 - y1;
 }
 
-fn func(lines: impl Iterator<Item = String>, part2: bool) {
+fn func(lines: impl Iterator<Item = String>) {
 
     let mut sensors : Vec<(i32, i32)> = Vec::new();
     let mut beacons : Vec<(i32, i32)> = Vec::new();
@@ -60,7 +59,7 @@ fn func(lines: impl Iterator<Item = String>, part2: bool) {
 
 
 pub fn part1(lines: impl Iterator<Item = String>) {
-    func(lines, false);
+    func(lines);
 }
 
 pub fn part2(lines: impl Iterator<Item = String>) {

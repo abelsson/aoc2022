@@ -1,7 +1,7 @@
 use itertools::Itertools;
 use std::io::prelude::*;
 
-pub fn part2(lines: impl Iterator<Item = impl Into<String>>) {
+pub fn part2(_lines: impl Iterator<Item = impl Into<String>>) {
     let res: Vec<i64> = std::io::stdin()
         .lock()
         .lines()

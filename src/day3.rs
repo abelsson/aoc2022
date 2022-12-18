@@ -4,7 +4,7 @@ use std::io::prelude::*;
 
 fn score(data: &str) -> u32 {
     let a = 'a' as u32 - 1;
-    let A = 'A' as u32 - 27;
+    let aa = 'A' as u32 - 27;
 
     let mid = data.len() / 2;
     let (first, second) = data.split_at(mid);
@@ -13,7 +13,7 @@ fn score(data: &str) -> u32 {
     let set_b = HashSet::from_iter(second.chars());
     let sum = set_a
         .intersection(&set_b)
-        .map(|ch| *ch as u32 - if ch.is_lowercase() { a } else { A })
+        .map(|ch| *ch as u32 - if ch.is_lowercase() { a } else { aa })
         .sum();
 
     return sum;
@@ -21,7 +21,7 @@ fn score(data: &str) -> u32 {
 
 fn score2(lines: impl Iterator<Item = impl Into<String>>) -> u32 {
     let a = 'a' as u32 - 1;
-    let A = 'A' as u32 - 27;
+    let aa = 'A' as u32 - 27;
 
     let v: Vec<HashSet<char>> = lines
         .map(|x| HashSet::from_iter(x.into().chars()))
@@ -29,7 +29,7 @@ fn score2(lines: impl Iterator<Item = impl Into<String>>) -> u32 {
 
     let sum = HashSet::from_iter(v[0].intersection(&v[1]).copied())
         .intersection(&v[2])
-        .map(|ch| *ch as u32 - if ch.is_lowercase() { a } else { A })
+        .map(|ch| *ch as u32 - if ch.is_lowercase() { a } else { aa })
         .sum();
 
     return sum;
