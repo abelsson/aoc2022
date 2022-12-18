@@ -1,5 +1,6 @@
+use itertools::iproduct;
 use regex::Regex;
-use std::collections::HashMap;
+use std::{cmp::max, collections::HashMap};
 
 #[derive(Clone, Debug)]
 struct Node {
@@ -79,23 +80,23 @@ impl Graph {
     }
 }
 
-fn score2(
+fn score(
     graph: &Graph,
     dists: &Vec<Vec<i32>>,
     valves_to_open: &Vec<usize>,
-    path: &Vec<usize>,
-    already_opened: &Vec<usize>,
+    state: u64,
     start: usize,
     current_time: i32,
     total_time: i32,
-) -> (i32, Vec<usize>) {
+    state_scores: &mut HashMap<u64, i32>,
+    flow_so_far: i32,
+) {
     let remaining_time = total_time - current_time;
 
-    let mut candidates: Vec<(i32, Vec<usize>)> = Vec::new();
     for valve in valves_to_open {
         let dist = dists[start][*valve];
 
-        if dist >= remaining_time || already_opened.contains(valve) {
+        if dist >= remaining_time || state & (1 << valve) != 0 {
             continue;
         }
 
@@ -108,36 +109,25 @@ fn score2(
             .map(|v| *v)
             .collect();
 
-        let mut next_path = path.clone();
-        next_path.push(*valve);
+        let new_state = state | 1 << *valve;
 
-        let candidate = score2(
+        score(
             graph,
             dists,
             &next_to_open,
-            &next_path,
-            &already_opened,
+            new_state,
             *valve,
             current_time + dist + 1,
             total_time,
+            state_scores,
+            flow_so_far + flow,
         );
-
-        let full_flow = flow + candidate.0;
-        let mut full_path = path.clone();
-        full_path.extend(candidate.1);
-        candidates.push((full_flow, full_path));
+        let entry = state_scores.entry(new_state).or_insert(0);
+        *entry = max(*entry, flow_so_far + flow);
     }
-
-    let mut flow: (i32, Vec<usize>) = (0, Vec::new());
-    for c in candidates {
-        if c.0 > flow.0 {
-            flow = c;
-        }
-    }
-    flow
 }
 
-fn func(lines: impl Iterator<Item = String>) {
+fn func(lines: impl Iterator<Item = String>, max_time: i32, part1: bool) {
     let mut graph = Graph::new();
 
     let mut foo: HashMap<String, Vec<String>> = HashMap::new();
@@ -169,7 +159,7 @@ fn func(lines: impl Iterator<Item = String>) {
         }
     }
 
-    // all pairs shortest paths (Floyd-Warshall)
+    // Calculate all pairs shortest paths (Floyd-Warshall)
     let num = graph.node_count();
     let mut dists: Vec<Vec<i32>> = vec![vec![10000; num]; num];
     for e in graph.edges.iter().flatten() {
@@ -188,47 +178,44 @@ fn func(lines: impl Iterator<Item = String>) {
             }
         }
     }
-
-    for i in 0..num {
-        for j in 0..num {
-            print!("{:2} ", dists[i][j]);
-        }
-        println!();
-    }
-
+    // Only consider valves with non-zero flow
     let valves_to_open = (0..num)
         .filter(|n| graph.nodes[*n].flow > 0)
         .collect::<Vec<usize>>();
-    dbg!(&valves_to_open);
-    //let s = score(&graph, &HashSet::new(), "AA", 0, &mut HashMap::new());
-    let s = score2(
+
+    // Calculate max score for each combination of open valves
+    let mut state_scores = HashMap::new();
+    score(
         &graph,
         &dists,
         &valves_to_open,
-        &vec![],
-        &Vec::new(),
+        0,
         graph.find("AA"),
         0,
-        26,
+        max_time,
+        &mut state_scores,
+        0,
     );
 
-    dbg!(&s);
-    let s2 = score2(
-        &graph,
-        &dists,
-        &valves_to_open,
-        &vec![graph.find("AA")],
-        &s.1,
-        graph.find("AA"),
-        0,
-        26,
-    );
-    dbg!(&s2);
-    println!("Score: {}", s.0 + s2.0);
+    let score = if part1 {
+        // Part 1: Return max of seen scores
+        *state_scores.values().max().unwrap_or(&0)
+    } else {
+        // Part 2: Return max of sum of two non-overlapping sets of open valves
+        iproduct!(state_scores.iter(), state_scores.iter())
+            .filter(|(a, b)| *a.0 & *b.0 == 0)
+            .map(|(a, b)| *a.1 + *b.1)
+            .max()
+            .unwrap_or(0)
+    };
+
+    println!("Score: {score}");
 }
 
 pub fn part1(lines: impl Iterator<Item = String>) {
-    func(lines);
+    func(lines, 30, true);
 }
 
-pub fn part2(_lines: impl Iterator<Item = String>) {}
+pub fn part2(lines: impl Iterator<Item = String>) {
+    func(lines, 26, false);
+}
