@@ -103,19 +103,14 @@ fn score(
         let minutes_left = remaining_time - dist - 1;
         let flow = graph.nodes[*valve].flow * minutes_left;
         let new_state = state | 1 << *valve;
-        let entry = state_scores.entry(new_state).or_insert(0);
-        *entry = max(*entry, flow_so_far + flow);
+        let state_entry = state_scores.entry(new_state).or_insert(0);
+        *state_entry = max(*state_entry, flow_so_far + flow);
 
-        let next_to_open: Vec<usize> = valves_to_open
-            .iter()
-            .filter(|v| *v != valve)
-            .map(|v| *v)
-            .collect();
-
+        let next_to_open = valves_to_open.clone().into_iter().filter(|x| x != valve);
         score(
             graph,
             dists,
-            &next_to_open,
+            &next_to_open.collect(),
             new_state,
             *valve,
             current_time + dist + 1,
