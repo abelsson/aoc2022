@@ -11,6 +11,7 @@ pub mod day15;
 pub mod day16;
 //pub mod day17;
 pub mod day18;
+pub mod day19;
 pub mod day2;
 pub mod day3;
 pub mod day4;
@@ -39,6 +40,8 @@ fn main() {
         //"17 2" => day17::part2(lines),
         "18 1" => day18::part1(lines),
         "18 2" => day18::part2(lines),
+        "19 1" => day19::part1(lines),
+        "19 2" => day19::part2(lines),
         _ => println!("unknown day {args}\n"),
     };
 }
