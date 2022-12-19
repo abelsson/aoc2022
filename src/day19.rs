@@ -11,6 +11,7 @@ struct Blueprint {
     geoder_ore: i32,
     geoder_obs: i32,
     max_ore: i32,
+    total_time: i32,
 }
 
 fn solve(
@@ -34,7 +35,7 @@ fn solve(
         return *result;
     }
 
-    if time == 32 {
+    if time == b.total_time {
         return i.3;
     }
 
@@ -107,19 +108,18 @@ fn solve(
 
     res
 }
-fn func(lines: impl Iterator<Item = String>, part2: bool) {
+fn func(lines: impl Iterator<Item = String>, total_time: i32) {
     let re = Regex::new(
         r"Blueprint ([0-9-]+): Each ore robot costs ([0-9-]+) ore. Each clay robot costs ([0-9-]+) ore. Each obsidian robot costs ([0-9-]+) ore and ([0-9-]+) clay. Each geode robot costs ([0-9-]+) ore and ([0-9-]+) obsidian.",
     )
     .unwrap();
 
     let mut blueprints: Vec<Blueprint> = Vec::new();
-    let mut idx = 1;
-    let mut sum = 0;
+
     for line in lines {
         let caps = re.captures(line.as_str()).unwrap();
 
-        let mut v = caps
+        let v = caps
             .iter()
             .filter_map(|x| x.unwrap().as_str().parse().ok())
             .collect::<Vec<i32>>();
@@ -131,6 +131,7 @@ fn func(lines: impl Iterator<Item = String>, part2: bool) {
             geoder_ore: v[5],
             geoder_obs: v[6],
             max_ore: vec![v[1], v[2], v[3], v[5]].into_iter().max().unwrap(),
+            total_time,
         };
         dbg!(&b);
 
@@ -139,7 +140,7 @@ fn func(lines: impl Iterator<Item = String>, part2: bool) {
     }
 
     let sum: i32 = blueprints
-        .iter()
+        .into_par_iter()
         .enumerate()
         .map(|(idx, b)| {
             let res = solve(&b, (1, 0, 0, 0), (0, 0, 0, 0), 0, &mut HashMap::new());
@@ -151,7 +152,9 @@ fn func(lines: impl Iterator<Item = String>, part2: bool) {
 }
 
 pub fn part1(lines: impl Iterator<Item = String>) {
-    func(lines, false);
+    func(lines, 24);
 }
 
-pub fn part2(lines: impl Iterator<Item = String>) {}
+pub fn part2(lines: impl Iterator<Item = String>) {
+    func(lines, 32);
+}
