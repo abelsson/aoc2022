@@ -94,7 +94,7 @@ pub fn func(lines: impl Iterator<Item = String>) {
         })
         .collect::<Vec<Vec<u32>>>();
 
-    let s = scenic_score(&nums, 2, 3);
+    scenic_score(&nums, 2, 3);
     //return;
     let mut count = 0;
     let mut scores = vec![0];
