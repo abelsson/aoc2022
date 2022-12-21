@@ -35,22 +35,19 @@ fn solve(
         return *result;
     }
 
-    if time == b.total_time {
-        return i.3;
+    if time == b.total_time - 1 {
+        return i.3 + r.3;
     }
 
     let new_i = (i.0 + r.0, i.1 + r.1, i.2 + r.2, i.3 + r.3);
 
     let mut cmds: Vec<((i32, i32, i32, i32), (i32, i32, i32, i32))> = Vec::new();
 
-    cmds.push((r, new_i));
-
     let need_ore = r.0 < b.max_ore;
     let need_clay = r.1 < b.obsr_clay;
     let need_obs = r.2 < b.geoder_obs;
-
     // New geode robot?
-    if i.0 >= b.geoder_ore && i.2 >= b.geoder_obs {
+    let can_build_geode = if i.0 >= b.geoder_ore && i.2 >= b.geoder_obs {
         cmds.push((
             (r.0, r.1, r.2, r.3 + 1),
             (
@@ -60,9 +57,13 @@ fn solve(
                 i.3 + r.3,
             ),
         ));
-    }
+        true
+    } else {
+        false
+    };
+
     // New obsidian robot?
-    if i.0 >= b.obsr_ore && i.1 >= b.obsr_clay && need_obs {
+    if i.0 >= b.obsr_ore && i.1 >= b.obsr_clay && need_obs && !can_build_geode {
         cmds.push((
             (r.0, r.1, r.2 + 1, r.3),
             (
@@ -74,18 +75,23 @@ fn solve(
         ));
     }
     // New clay robot?
-    if i.0 >= b.clayr_ore && need_clay {
+    if i.0 >= b.clayr_ore && need_clay && !can_build_geode {
         cmds.push((
             (r.0, r.1 + 1, r.2, r.3),
             (i.0 + r.0 - b.clayr_ore, i.1 + r.1, i.2 + r.2, i.3 + r.3),
         ));
     }
     // New ore robot?
-    if i.0 >= b.orer_ore && need_ore {
+    if i.0 >= b.orer_ore && need_ore && !can_build_geode {
         cmds.push((
             (r.0 + 1, r.1, r.2, r.3),
             (i.0 + r.0 - b.orer_ore, i.1 + r.1, i.2 + r.2, i.3 + r.3),
         ));
+    }
+
+    // Do nothing?
+    if !can_build_geode {
+        cmds.push((r, new_i));
     }
 
     /*

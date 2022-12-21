@@ -13,9 +13,14 @@ pub mod day16;
 pub mod day18;
 pub mod day19;
 pub mod day2;
+pub mod day20;
 pub mod day3;
 pub mod day4;
 pub mod day5;
+pub mod day6;
+pub mod day7;
+pub mod day8;
+pub mod day9;
 
 fn main() {
     //day1::day1();
@@ -25,6 +30,13 @@ fn main() {
         "1 2" => day1::part2(lines),
         "4 1" => day4::part1(lines),
         "4 2" => day4::part2(lines),
+        "5" => day5::func(lines),
+        "6 1" => day6::part1(lines),
+        "6 2" => day6::part2(lines),
+        "7" => day7::func(lines),
+        "8" => day8::func(lines),
+        "9 1" => day9::part1(lines),
+        "9 2" => day9::part2(lines),
         "10" => day10::func(lines),
         "11 1" => day11::part1(lines),
         "11 2" => day11::part2(lines),
@@ -42,6 +54,8 @@ fn main() {
         "18 2" => day18::part2(lines),
         "19 1" => day19::part1(lines),
         "19 2" => day19::part2(lines),
+        "20 1" => day20::part1(lines),
+        "20 2" => day20::part2(lines),
         _ => println!("unknown day {args}\n"),
     };
 }
