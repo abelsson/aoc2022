@@ -247,16 +247,6 @@ pub fn part2(lines_it: impl Iterator<Item = String>) {
         faces[idx].display(0, 0, face_size + 2, face_size + 2);
     }
 
-    // top, right, down, left
-    let neighbours = [
-        [2, 6, 4, 3],
-        [1, 3, 5, 6],
-        [1, 4, 5, 1],
-        [1, 6, 5, 3],
-        [5, 4, 3, 6],
-        [1, 2, 4, 5],
-    ];
-
     let mut direction = 'R';
     let mut y = 1;
     let mut x = 1;
@@ -272,7 +262,7 @@ pub fn part2(lines_it: impl Iterator<Item = String>) {
     println!("{directions}");
     let ds = directions.split_inclusive(&['R', 'L']).collect_vec();
 
-    let mut count = 5;
+    let count = 5;
     for d in ds {
         let turn = d.chars().last().unwrap();
         let amount = d
@@ -300,9 +290,6 @@ pub fn part2(lines_it: impl Iterator<Item = String>) {
 
             if px == 0 {
                 // wrap
-                let prev_x = x;
-                let prev_y = y;
-
                 let w = face_size;
                 let m = |x| w + 1 - x;
                 let (new_face, new_dir, new_x, new_y) = match (face + 1, direction) {

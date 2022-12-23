@@ -155,7 +155,7 @@ fn func(lines: impl Iterator<Item = String>, max_time: i32, part1: bool) {
 
     // Calculate all pairs shortest paths (Floyd-Warshall)
     let num = graph.node_count();
-    let mut dists: Vec<Vec<i32>> = vec![vec![10000; num]; num];
+    let mut dists: Vec<Vec<i32>> = vec![vec![i32::MAX; num]; num];
     for e in graph.edges.iter().flatten() {
         dists[e.src][e.dest] = 1;
         dists[e.dest][e.src] = 1;
