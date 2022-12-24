@@ -18,6 +18,7 @@ pub mod day20;
 pub mod day21;
 pub mod day22;
 pub mod day23;
+pub mod day24;
 pub mod day3;
 pub mod day4;
 pub mod day5;
@@ -32,6 +33,7 @@ fn main() {
     let lines = std::io::stdin().lock().lines().flatten();
     match &*args {
         "1 2" => day1::part2(lines),
+        "3 2" => day3::func2(lines),
         "4 1" => day4::part1(lines),
         "4 2" => day4::part2(lines),
         "5" => day5::func(lines),
@@ -68,6 +70,8 @@ fn main() {
         "22 2" => day22::part2(lines),
         "23 1" => day23::part1(lines),
         "23 2" => day23::part2(lines),
+        "24 1" => day24::part1(lines),
+        "24 2" => day24::part2(lines),
         _ => println!("unknown day {args}\n"),
     };
 }
