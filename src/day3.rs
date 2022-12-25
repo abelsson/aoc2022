@@ -1,7 +1,6 @@
 use itertools::Itertools;
 use std::collections::HashSet;
 use std::io::prelude::*;
-use std::ops::BitAnd;
 
 fn score(data: &str) -> u32 {
     let a = 'a' as u32 - 1;

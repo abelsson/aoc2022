@@ -1,78 +1,8 @@
+use crate::canvas::Canvas;
 use itertools::Itertools;
 use std::cmp::max;
 
-struct Canvas {
-    pixels: Vec<i32>,
-    height: i32,
-    width: i32,
-}
-
 impl Canvas {
-    fn new(width: i32, height: i32) -> Canvas {
-        Canvas {
-            pixels: vec![0; (height * width) as usize],
-            height: height,
-            width: width,
-        }
-    }
-
-    fn get_pixel(&self, x: i32, y: i32) -> i32 {
-        return self.pixels[y as usize * self.width as usize + x as usize];
-    }
-    fn set_pixel(&mut self, x: i32, y: i32, value: i32) {
-        self.pixels[y as usize * self.width as usize + x as usize] = value;
-    }
-
-    fn hline(&mut self, x1: i32, x2: i32, y: i32, value: i32) {
-        let (start, end) = if x1 < x2 { (x1, x2) } else { (x2, x1) };
-
-        for x in start..=end {
-            self.set_pixel(x, y, value);
-        }
-    }
-
-    fn vline(&mut self, x: i32, y1: i32, y2: i32, value: i32) {
-        let (start, end) = if y1 < y2 { (y1, y2) } else { (y2, y1) };
-
-        for y in start..=end {
-            self.set_pixel(x, y, value);
-        }
-    }
-
-    fn display(&self, sx: i32, sy: i32, width: i32, height: i32) {
-        println!("P2 {width} {height} 5");
-        for y in sy..(sy + height) {
-            for x in sx..(sx + width) {
-                let pixel = self.get_pixel(x, y);
-                print!("{pixel} ");
-            }
-            println!();
-        }
-    }
-
-    fn neighbours4(&self, x: i32, y: i32, diagonals: bool) -> Vec<(i32, i32)> {
-        let offsets = if diagonals {
-            vec![
-                (-1, -1),
-                (0, -1),
-                (1, -1),
-                (-1, 0),
-                (1, 0),
-                (-1, 1),
-                (0, 1),
-                (1, 1),
-            ]
-        } else {
-            vec![(-1, 0), (1, 0), (0, -1), (0, 1)]
-        };
-
-        return offsets
-            .iter()
-            .map(|c| (x + c.0, y + c.1))
-            .filter(|c| c.0 >= 0 && c.1 >= 0 && c.0 < self.width && c.1 < self.height)
-            .collect();
-    }
-
     fn step_sand(&mut self) -> bool {
         let mut x = 500;
         let mut y = 0;

@@ -1,16 +1,16 @@
 use itertools::{iproduct, Itertools};
 use std::collections::VecDeque;
 
-struct Canvas {
+struct Canvas3d {
     pixels: Vec<i32>,
     height: i32,
     width: i32,
     depth: i32,
 }
 
-impl Canvas {
-    fn new(width: i32, height: i32, depth: i32) -> Canvas {
-        Canvas {
+impl Canvas3d {
+    fn new(width: i32, height: i32, depth: i32) -> Canvas3d {
+        Canvas3d {
             pixels: vec![0; (height * width * depth) as usize],
             height,
             width,
@@ -54,7 +54,7 @@ impl Canvas {
     }
 }
 
-fn flood_fill(canvas: &mut Canvas) {
+fn flood_fill(canvas: &mut Canvas3d) {
     let mut queue = VecDeque::new();
 
     queue.push_back((0, 0, 0));
@@ -72,7 +72,7 @@ fn flood_fill(canvas: &mut Canvas) {
     }
 }
 fn func(lines: impl Iterator<Item = String>, part2: bool) {
-    let mut canvas = Canvas::new(100, 100, 100);
+    let mut canvas = Canvas3d::new(100, 100, 100);
 
     for line in lines {
         let (x, y, z) = line

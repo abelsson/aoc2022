@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 use std::env;
 use std::io::prelude::*;
-
+pub mod canvas;
 pub mod day1;
 pub mod day10;
 pub mod day11;
@@ -19,6 +19,7 @@ pub mod day21;
 pub mod day22;
 pub mod day23;
 pub mod day24;
+pub mod day25;
 pub mod day3;
 pub mod day4;
 pub mod day5;
@@ -26,6 +27,7 @@ pub mod day6;
 pub mod day7;
 pub mod day8;
 pub mod day9;
+pub mod graph;
 
 fn main() {
     //day1::day1();
@@ -72,6 +74,8 @@ fn main() {
         "23 2" => day23::part2(lines),
         "24 1" => day24::part1(lines),
         "24 2" => day24::part2(lines),
+        "25 1" => day25::part1(lines),
+        "25 2" => day25::part2(lines),
         _ => println!("unknown day {args}\n"),
     };
 }

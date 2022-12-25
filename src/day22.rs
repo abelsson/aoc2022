@@ -1,80 +1,5 @@
+use crate::canvas::Canvas;
 use itertools::Itertools;
-use std::cmp::max;
-use std::collections::HashMap;
-
-#[derive(Clone)]
-struct Canvas {
-    pixels: Vec<i32>,
-    height: i32,
-    width: i32,
-}
-
-impl Canvas {
-    fn new(width: i32, height: i32) -> Canvas {
-        Canvas {
-            pixels: vec![0; (height * width) as usize],
-            height: height,
-            width: width,
-        }
-    }
-
-    fn get_pixel(&self, x: i32, y: i32) -> i32 {
-        return self.pixels[y as usize * self.width as usize + x as usize];
-    }
-    fn set_pixel(&mut self, x: i32, y: i32, value: i32) {
-        self.pixels[y as usize * self.width as usize + x as usize] = value;
-    }
-
-    fn hline(&mut self, x1: i32, x2: i32, y: i32, value: i32) {
-        let (start, end) = if x1 < x2 { (x1, x2) } else { (x2, x1) };
-
-        for x in start..=end {
-            self.set_pixel(x, y, value);
-        }
-    }
-
-    fn vline(&mut self, x: i32, y1: i32, y2: i32, value: i32) {
-        let (start, end) = if y1 < y2 { (y1, y2) } else { (y2, y1) };
-
-        for y in start..=end {
-            self.set_pixel(x, y, value);
-        }
-    }
-
-    fn display(&self, sx: i32, sy: i32, width: i32, height: i32) {
-        println!("P2 {width} {height} 5");
-        for y in sy..(sy + height) {
-            for x in sx..(sx + width) {
-                let pixel = self.get_pixel(x, y);
-                print!("{pixel} ");
-            }
-            println!();
-        }
-    }
-
-    fn neighbours4(&self, x: i32, y: i32, diagonals: bool) -> Vec<(i32, i32)> {
-        let offsets = if diagonals {
-            vec![
-                (-1, -1),
-                (0, -1),
-                (1, -1),
-                (-1, 0),
-                (1, 0),
-                (-1, 1),
-                (0, 1),
-                (1, 1),
-            ]
-        } else {
-            vec![(-1, 0), (1, 0), (0, -1), (0, 1)]
-        };
-
-        return offsets
-            .iter()
-            .map(|c| (x + c.0, y + c.1))
-            .filter(|c| c.0 >= 0 && c.1 >= 0 && c.0 < self.width && c.1 < self.height)
-            .collect();
-    }
-}
 
 fn turn_func(dir: char, turn: char) -> char {
     match (dir, turn) {
@@ -89,7 +14,7 @@ fn turn_func(dir: char, turn: char) -> char {
         (_, _) => dir,
     }
 }
-fn func(lines_it: impl Iterator<Item = String>, part2: bool) {
+fn func(lines_it: impl Iterator<Item = String>) {
     let mut canvas = Canvas::new(500, 500);
     let lines = lines_it.collect_vec();
     for (y, line) in lines.iter().enumerate() {
@@ -212,7 +137,7 @@ fn func(lines_it: impl Iterator<Item = String>, part2: bool) {
 
 pub fn part1(lines: impl Iterator<Item = String>) {
     // 40240
-    func(lines, false);
+    func(lines);
 }
 
 pub fn part2(lines_it: impl Iterator<Item = String>) {
@@ -374,32 +299,4 @@ pub fn part2(lines_it: impl Iterator<Item = String>) {
         "face: {} | {sx} + {x}, {sy} + {y} {direction} {res}",
         face + 1
     );
-
-    /*
-
-       1 U -> 6 R, x = 1, y = x
-       1 R -> 2 R, x = 2, y = y
-       1 D -> 3 D, x = x, y = 1
-       1 L -> 4 R, x = 1, y =!y
-       2 U -> 6 U, x = x, y = w
-       2 R -> 5 L, x = w, y =!y
-       2 D -> 3 L, x = w, y = x
-       2 L -> 1 L, x = w, y = y
-       3 U -> 1 U, x = x, y = w
-       3 R -> 2 U, x = y, y = w
-       3 D -> 5 D, x = x, y = 1
-       3 L -> 4 D, x = y, y = 1
-       4 U -> 3 R, x = 1, y = y
-       4 R -> 5 R, x = 1, y = y
-       4 D -> 6 D, x = x, y = 1
-       4 L -> 1 R, x = 1, y =!y
-       5 U -> 3 U, x = x, y = w
-       5 R -> 2 L, x = w, y =!y
-       5 D -> 6 L, x = w, y = x
-       5 L -> 4 L, x = w, y = y
-       6 U -> 4 U, x = x, y = w
-       6 R -> 5 U, x = y, y = w
-       6 D -> 2 D, x = x, y = 1
-       6 L -> 1 D, x = y, y = 1
-    */
 }
